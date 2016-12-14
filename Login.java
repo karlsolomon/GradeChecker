@@ -148,7 +148,7 @@ public class Login implements Runnable{
 				e.printStackTrace();
 			}
 			try {
-				Thread.sleep(60000);
+				Thread.sleep(waitTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

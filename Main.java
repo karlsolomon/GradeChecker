@@ -46,10 +46,8 @@ public class Main extends Application{
 	String email;
 	String emailPassword;
 	Integer classes;
-	Integer refresh = 2;
-	Integer time;
-	Integer hours;
-	Integer minutes;
+	Integer refreshMinutes = 2;
+	Integer time = 0;
 	Long lastTime;
 	Map<String, String> uniqueIDs = new HashMap<>();	
 	
@@ -101,7 +99,7 @@ public class Main extends Application{
 				boolean clean = false;
 				try {
 					sb.append("Gmail: " + getGmail() + "\n");
-					sb.append("Refresh Time: " + getDelay() + " hours\n");
+					sb.append("Refresh Time: " + getDelay() + " minutes\n");
 					clean = ConfirmBox.display("Change Settings", "Would you like to change your settings? They are currently:\n" + sb.toString() + "\nIf you would like to change these settings or they are inaccurate click \"yes\"");
 					
 				} catch (NullPointerException e1) {
@@ -120,7 +118,7 @@ public class Main extends Application{
 	}
 	
 	private void run(Stage primaryStage) {
-		long hour = 1000*60*60;
+		long minute = 1000*60;
 		Login utGrades = new Login();
 		Map<String, String> uniqueIDs = getUniquesAndCourses();
 		
@@ -131,14 +129,12 @@ public class Main extends Application{
 		pane.getChildren().add(nextCheck);
 		root.getChildren().add(pane);
 		Scene scene = new Scene(root);
-		hours = 0;
-		minutes = 0;
-		time = refresh*60;
+
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Refresh Window");
 		primaryStage.setMinHeight(150);
 		primaryStage.setOnShowing(e -> {
-			nextCheck.setText("Checking in:\n" + hours.toString() + " hours, " + minutes.toString() + " minutes");
+			nextCheck.setText("Checking in:\n" + refreshMinutes.toString() + " minutes");
 		});
 		primaryStage.show();
 		Timer timer = new Timer();
@@ -146,24 +142,22 @@ public class Main extends Application{
 			
 			@Override
 			public void run() {
-				time -= 1;
-				if(refresh < 1) {
-					refresh = 1;
+				time-=1;
+				if(refreshMinutes < 1) {
+					refreshMinutes = 1;
 				}
 				if(time < 1) {
-					time = refresh*60;
+					time = refreshMinutes;
 				}
-				hours = time/60;
-				minutes = time%60;
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-						nextCheck.setText("Close this window to terminate the program.\n\nChecking in:\n" + hours.toString() + " hours, " + minutes.toString() + " minutes");
+						nextCheck.setText("Close this window to terminate the program.\n\nChecking in:\n" + time.toString() + " minutes");
 					}
 				});
 			}
 		};
-		timer.schedule(updateSearchTime, 0, 1000*60);
+		timer.schedule(updateSearchTime, 0, minute);
 		
 		primaryStage.setOnCloseRequest(e -> {
 			boolean close = ConfirmBox.display("Are you Sure?", "Closing the refresh window will terminate the program. Are you sure you want to terminate the program?");
@@ -176,7 +170,7 @@ public class Main extends Application{
 		});
 		
 		try {
-			utGrades.initialize(eidText, eidPasswordText, getGmail(), getGmailPassword(), uniqueIDs, refresh*hour);
+			utGrades.initialize(eidText, eidPasswordText, getGmail(), getGmailPassword(), uniqueIDs, refreshMinutes*minute);
 			Thread check = new Thread(utGrades);
 			check.start();
 		} catch (Exception e) {
@@ -208,7 +202,6 @@ public class Main extends Application{
 		    }
 		} catch (IOException e) {
 			cleanFile();
-			
 		}
 		return false;
 	}
@@ -245,15 +238,15 @@ public class Main extends Application{
 		courseLabel.setText("Number of Courses");
 		numCourses.setMax(10);
 		numCourses.setMin(1);
-		refreshTime.setMax(12);
+		refreshTime.setMax(60);
 		refreshTime.setMin(1);
-		refreshLabel.setText("Time between queries (hours): ");
+		refreshLabel.setText("Time between queries (minutes): ");
 		
 		refreshTime.valueProperty().addListener((obs, oldval, newVal) -> {
 			Integer value = newVal.intValue();
 			refreshTime.setValue(value);
-			refreshLabel.setText("Time between queries (hours): " + value.toString());
-			refresh = value;
+			refreshLabel.setText("Time between queries (minutes): " + value.toString());
+			refreshMinutes = value;
 		});
 		
 		StackPane.setAlignment(fields,Pos.CENTER);
@@ -293,7 +286,7 @@ public class Main extends Application{
 			System.out.println("clicked submit");
 			email = gmail.getText();
 			emailPassword = password.getText();
-			populateData(uniques.getChildren(), courses.getChildren(), eidText, eidPasswordText, email, emailPassword, refresh);
+			populateData(uniques.getChildren(), courses.getChildren(), eidText, eidPasswordText, email, emailPassword, refreshMinutes);
 			run(primaryStage);
 		});
 	}
@@ -348,7 +341,7 @@ public class Main extends Application{
 				line = bf.readLine();
 				if(line.startsWith("delay")) {
 					delay = line.split(",");
-					refresh = Integer.parseInt(delay[1]);
+					refreshMinutes = Integer.parseInt(delay[1]);
 					bf.close();
 					return delay[1];			
 				}
