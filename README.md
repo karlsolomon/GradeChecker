@@ -1,4 +1,4 @@
-# GradeReporter
+# GradeChecker
 Automatically checks the UT Grade Report page for updates to your grade
 
 This tool will automatically check you UT Grade Report periodically to see if any of your grades have changed.
