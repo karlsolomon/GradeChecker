@@ -21,6 +21,8 @@ Please feel free to give me feedback on ways that I can improve/fix or any featu
 Please also feel free to make revisions to this if you'd like to contribute as well.
 
 
+DISCLAIMER: This project is in early dev. stages. It will eventually become an Android/iOS application that students can run in the background on their phones. This is a beta for the mobile apps.
+
 
 This is free and unencumbered software released into the public domain.
 
